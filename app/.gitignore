@@ -18,5 +18,3 @@ local.properties
 
 *~
 *.swp
-app/src/test/
-app/src/androidTest/
