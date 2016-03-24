@@ -13,16 +13,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import framgia.vn.readrss.R;
 import framgia.vn.readrss.controller.AdapterListPost;
 import framgia.vn.readrss.models.Data;
 
-/**
- * Created by FRAMGIA\nguyen.huy.quyet on 17/03/2016.
- */
+
 public class FragmentListPost extends Fragment {
-    private ArrayList<Data> dataArrayList = new ArrayList<>();
+    private List<Data> dataArrayList = new ArrayList<>();
     private Data itemSelect = null;
     private ListView lv_post;
     private AdapterListPost adapter = null;
@@ -30,12 +29,11 @@ public class FragmentListPost extends Fragment {
     private TextView textViewName;
     private String namelist;
 
-    public FragmentListPost(ArrayList<Data> dataArrayList, Activity context, String name_List) {
+    public FragmentListPost(List<Data> dataArrayList, Activity context, String nameList) {
         this.dataArrayList = dataArrayList;
         this.context = context;
-        this.namelist = name_List;
+        this.namelist = nameList;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,7 +43,6 @@ public class FragmentListPost extends Fragment {
         lv_post = (ListView) view.findViewById(R.id.lv_post);
         adapter = new AdapterListPost(context, R.layout.custom_list_post, dataArrayList);
         lv_post.setAdapter(adapter);
-
         lv_post.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -59,6 +56,4 @@ public class FragmentListPost extends Fragment {
         });
         return view;
     }
-
-
 }

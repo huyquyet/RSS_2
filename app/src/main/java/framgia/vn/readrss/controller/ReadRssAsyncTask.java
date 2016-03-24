@@ -17,37 +17,34 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import framgia.vn.readrss.models.Data;
-import framgia.vn.readrss.models.Informations;
+import framgia.vn.readrss.models.Information;
 import framgia.vn.readrss.models.LinkUrl;
 import framgia.vn.readrss.models.ListData;
+import framgia.vn.readrss.stringInterface.noteXml;
 
-/**
- * Created by FRAMGIA\nguyen.huy.quyet on 15/03/2016.
- */
-public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Data>, ArrayList<Data>> {
+public class ReadRssAsyncTask extends AsyncTask<List<LinkUrl>, ArrayList<Data>, ArrayList<Data>> implements noteXml {
     private Activity context;
-    private URL url = null;
-    private HttpURLConnection conn = null;
-    private InputStream stream = null;
-    private XmlPullParserFactory xmlFactoryObject = null;
-    private XmlPullParser myparser = null;
-    private Data item = null;
+    private URL url;
+    private HttpURLConnection conn;
+    private InputStream stream;
+    private XmlPullParserFactory xmlFactoryObject;
+    private XmlPullParser myparser;
+    private Data item;
     private ArrayList<Data> items = new ArrayList<Data>();
     private List<ListData> listPosts = new ArrayList<>();
     private UpdateData update;
-    private Informations informations = new Informations();
+    private Information informations = new Information();
     private FormatDate formatDate = new FormatDate();
 
     public ReadRssAsyncTask(Activity ctx) {
         context = ctx;
     }
 
-    public Informations getInformations() {
+    public Information getInformations() {
         return informations;
     }
 
@@ -65,8 +62,8 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
     }
 
     @Override
-    protected ArrayList<Data> doInBackground(ArrayList<LinkUrl>... params) {
-        ArrayList<LinkUrl> arr = params[0];
+    protected ArrayList<Data> doInBackground(List<LinkUrl>... params) {
+        List<LinkUrl> arr = params[0];
         try {
             for (LinkUrl linkUrl : arr) {
                 myparser = parserXML(linkUrl.getUrl());
@@ -88,7 +85,6 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        publishProgress(items);
         return null;
     }
 
@@ -110,7 +106,6 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
     public void parseXMLInformation(XmlPullParser myParser) {
         int event;
         String text = null;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         try {
             event = myParser.getEventType();
             boolean check = false;
@@ -119,11 +114,11 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
                 String name = myParser.getName();
                 switch (event) {
                     case XmlPullParser.START_TAG: // event = 2
-                        if (name.equals("item")) {
+                        if (name.equals(XML_ITEM_ITEM)) {
                             check = true;
                             break;
                         }
-                        if (name.equals("image")) {
+                        if (name.equals(XML_INFORMATION_IMAGE)) {
                             check_image = true;
                             break;
                         }
@@ -133,37 +128,37 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
                         break;
                     case XmlPullParser.END_TAG: // event = 3
                         switch (name) {
-                            case "title":
+                            case XML_INFORMATION_TITLE:
                                 informations.setTitle(text);
                                 break;
-                            case "link":
+                            case XML_INFORMATION_LINK:
                                 informations.setLink(text);
                                 break;
-                            case "description":
+                            case XML_INFORMATION_DESCRIPTION:
                                 informations.setDescription(text);
                                 break;
-                            case "url":
+                            case XML_INFORMATION_IMAGE_URL:
                                 if (check_image) {
                                     informations.setImage(text);
                                     check_image = false;
                                 }
                                 break;
-                            case "language":
+                            case XML_INFORMATION_LANGUAGE:
                                 informations.setLanguage(text);
                                 break;
-                            case "copyright":
+                            case XML_INFORMATION_COPYRIGHT:
                                 informations.setCopyright(text);
                                 break;
-                            case "lastBuildDate":
+                            case XML_INFORMATION_LASTBUILDATE:
                                 informations.setLastBuildDate(formatDate.formatDateToString(formatDate.formatDate(text)));
                                 break;
-                            case "generator":
+                            case XML_INFORMATION_GENERATOR:
                                 informations.setGenerator(text);
                                 break;
-                            case "atom:link":
+                            case XML_INFORMATION_ATOM:
                                 informations.setAtom(myParser.getAttributeValue(0));
                                 break;
-                            case "ttl":
+                            case XML_INFORMATION_TTL:
                                 informations.setTtl(text);
                                 break;
                         }
@@ -193,7 +188,7 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
                 String name = myParser.getName();
                 switch (event) {
                     case XmlPullParser.START_TAG: // event = 2
-                        if (name.equals("item")) {
+                        if (name.equals(XML_ITEM_ITEM)) {
                             insideItem = true;
                             item = new Data();
                             item.setCategory(category);
@@ -204,23 +199,23 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
                         break;
                     case XmlPullParser.END_TAG: // event = 3
                         if (insideItem) {
-                            if (name.equalsIgnoreCase("title")) {
+                            if (name.equalsIgnoreCase(XML_ITEM_TITLE)) {
                                 item.setTitle(text); //extract the headline
-                            } else if (name.equals("description")) {
+                            } else if (name.equals(XML_ITEM_DESCRIPTION)) {
                                 item.setDescription(text);
-                            } else if (name.equalsIgnoreCase("link")) {
+                            } else if (name.equalsIgnoreCase(XML_ITEM_LINK)) {
                                 item.setLink(text); //extract the link of article
-                            } else if (name.equals("guid")) {
+                            } else if (name.equals(XML_ITEM_GUID)) {
                                 item.setGuid(text);
-                            } else if (name.equals("pubDate")) {
+                            } else if (name.equals(XML_ITEM_PUBDATE)) {
                                 item.setPubDate(formatDate.formatDateToString(formatDate.formatDate(text)));
-                            } else if (name.equals("category")) {
+                            } else if (name.equals(XML_ITEM_CATEGORY)) {
                                 item.setarrayListcategory(text);
-                            } else if (name.equals("author")) {
+                            } else if (name.equals(XML_ITEM_AUTHOR)) {
                                 item.setAuthor(text);
-                            } else if (name.equals("enclosure")) {
+                            } else if (name.equals(XML_ITEM_ENCLOSURE)) {
                                 item.setEnclosure(myParser.getAttributeValue(0));
-                            } else if (name.equals("item")) {
+                            } else if (name.equals(XML_ITEM_ITEM)) {
                                 insideItem = false;
                                 result.add(item);
                             }
@@ -229,7 +224,6 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
                 }
                 event = myParser.next();
             }
-
             ListData list = new ListData(result, category);
             listPosts.add(list);
         } catch (XmlPullParserException e) {
@@ -267,14 +261,11 @@ public class ReadRssAsyncTask extends AsyncTask<ArrayList<LinkUrl>, ArrayList<Da
         conn.setRequestMethod("GET");
         conn.setDoInput(true);
         conn.connect();
-
         stream = conn.getInputStream();
         xmlFactoryObject = XmlPullParserFactory.newInstance();
         parser = xmlFactoryObject.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(stream, null);
-
         return parser;
     }
-
 }

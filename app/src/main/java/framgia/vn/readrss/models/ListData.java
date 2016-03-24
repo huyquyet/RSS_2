@@ -10,7 +10,6 @@ public class ListData {
     private String category;
 
     public ListData() {
-
     }
 
     public ListData(ArrayList<Data> arr, String category) {

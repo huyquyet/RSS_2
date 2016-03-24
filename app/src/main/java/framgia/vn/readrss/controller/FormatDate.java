@@ -5,9 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Created by FRAMGIA\nguyen.huy.quyet on 22/03/2016.
- */
 public class FormatDate {
 
     /**
@@ -34,5 +31,4 @@ public class FormatDate {
         System.out.println(date);
         return date;
     }
-
 }

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import framgia.vn.readrss.R;
 import framgia.vn.readrss.models.Data;
 
-
 /**
  * Created by FRAMGIA\nguyen.huy.quyet on 17/03/2016.
  */
@@ -23,7 +22,6 @@ public class FragmentDetailPost extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_post, container, false);
-
         return view;
     }
 }

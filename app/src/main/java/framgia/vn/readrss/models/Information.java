@@ -3,7 +3,7 @@ package framgia.vn.readrss.models;
 /**
  * Created by FRAMGIA\nguyen.huy.quyet on 15/03/2016.
  */
-public class Informations {
+public class Information {
     private String title;
     private String link;
     private String description;

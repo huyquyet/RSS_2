@@ -14,10 +14,9 @@ public class Data implements Serializable {
     private String guid;
     private String pubDate;
     private String category;
-    private ArrayList<String> arrayListcategory = new ArrayList<>();
+    private ArrayList<String> arrayListCategory = new ArrayList<>();
     private String author;
     private String enclosure;
-
 
     public String getId() {
         return id;
@@ -44,11 +43,11 @@ public class Data implements Serializable {
     }
 
     public ArrayList<String> getarrayListcategory() {
-        return arrayListcategory;
+        return arrayListCategory;
     }
 
     public void setarrayListcategory(String category) {
-        this.arrayListcategory.add(category);
+        this.arrayListCategory.add(category);
     }
 
     public String getDescription() {
@@ -103,13 +102,13 @@ public class Data implements Serializable {
         super();
     }
 
-    public Data(String title, String description, String link, String guid, String pubDate, ArrayList<String> arrayListcategory, String author, String enclosure) {
+    public Data(String title, String description, String link, String guid, String pubDate, ArrayList<String> arrayListCategory, String author, String enclosure) {
         this.title = title;
         this.description = description;
         this.link = link;
         this.guid = guid;
         this.pubDate = pubDate;
-        this.arrayListcategory = arrayListcategory;
+        this.arrayListCategory = arrayListCategory;
         this.author = author;
         this.enclosure = enclosure;
     }

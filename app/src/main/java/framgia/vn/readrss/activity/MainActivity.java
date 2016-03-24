@@ -14,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,16 +28,18 @@ import framgia.vn.readrss.activity.fragment.FragmentMain;
 import framgia.vn.readrss.controller.Database;
 import framgia.vn.readrss.controller.ReadRssAsyncTask;
 import framgia.vn.readrss.models.Data;
-import framgia.vn.readrss.models.Informations;
+import framgia.vn.readrss.models.Information;
 import framgia.vn.readrss.models.LinkUrl;
 import framgia.vn.readrss.models.ListData;
+import framgia.vn.readrss.stringInterface.ConstDB;
+import framgia.vn.readrss.stringInterface.Url;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ConstDB, Url {
     List<ListData> listPosts = null;
-    Informations informations = null;
-    ArrayList<Data> categoryArrList = null;
-    ArrayList<LinkUrl> urlArrayList = null;
+    Information information = null;
+    List<Data> categoryArrList = null;
+    List<LinkUrl> urlArrayList = null;
     ReadRssAsyncTask readRssAsyncTask = null;
     Database database = null;
     SQLiteDatabase sqLiteDatabase = null;
@@ -47,18 +48,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setToolbar();
         database = new Database(this);
-
         //  Open connect database
         sqLiteDatabase = connectDataBase();
         if (sqLiteDatabase != null) //  if database !+ null
@@ -73,22 +64,14 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public boolean updateData(boolean update) {
                     if (update) {
-//                        getFragmentManager().beginTransaction().
                         getData();
-                        updateInformation(informations);
+                        updateInformation(information);
                         updatePost(listPosts);
                     }
                     return false;
                 }
             });
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -132,19 +115,40 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void setToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
     private boolean checkInternetConnection() {
+        int TypeWifi = ConnectivityManager.TYPE_WIFI;
+        int TypeMobile = ConnectivityManager.TYPE_MOBILE;
         // get Connectivity Manager object to check connection
         ConnectivityManager connec = (ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
         // Check for network connections
-        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
-//            Toast.makeText(this, " Connected ", Toast.LENGTH_LONG).show();
+        if (connec.getNetworkInfo(TypeMobile).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(TypeMobile).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(TypeWifi).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(TypeWifi).getState() == android.net.NetworkInfo.State.CONNECTED) {
             return true;
         } else if (
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED) {
+                connec.getNetworkInfo(TypeMobile).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(TypeWifi).getState() == android.net.NetworkInfo.State.DISCONNECTED) {
             Toast.makeText(this, " Not Connected ", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -157,20 +161,19 @@ public class MainActivity extends AppCompatActivity
             /**
              * Mo CSDL neu ko co thi tao moi
              */
-            Database = openOrCreateDatabase("readRss.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+            Database = openOrCreateDatabase(NAME_DATABASE, SQLiteDatabase.CREATE_IF_NECESSARY, null);
         } catch (Exception ex) {
-            Log.d("error", ex.toString());
         }
         return Database;
     }
 
     private void getData() {
-        this.informations = readRssAsyncTask.getInformations();
+        this.information = readRssAsyncTask.getInformations();
         setFragment();
         this.listPosts = readRssAsyncTask.getListPosts();
     }
 
-    private void updateInformation(Informations data) {
+    private void updateInformation(Information data) {
         sqLiteDatabase = connectDataBase();
         if (sqLiteDatabase != null) {
             database.insertOrUpdateDataInformation(sqLiteDatabase, data);
@@ -188,7 +191,7 @@ public class MainActivity extends AppCompatActivity
         // get fragment manager
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.add(R.id.fragment, new FragmentMain(informations));
+        ft.add(R.id.fragment, new FragmentMain(information));
         ft.commit();
     }
 
@@ -196,78 +199,78 @@ public class MainActivity extends AppCompatActivity
         Fragment fr;
         switch (idItem) {
             case R.id.nav_usa:
-                getArrListCatrgory("USA");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "USA");
+                getArrListCatrgory(NAME_URL_USA);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_USA);
                 break;
             case R.id.nav_africa:
-                getArrListCatrgory("Africa");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Africa");
+                getArrListCatrgory(NAME_URL_AFRICA);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_AFRICA);
                 break;
             case R.id.nav_asia:
-                getArrListCatrgory("Asia");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Asia");
+                getArrListCatrgory(NAME_URL_ASIA);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ASIA);
                 break;
             case R.id.nav_middle_east:
-                getArrListCatrgory("Middle East");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Middle East");
+                getArrListCatrgory(NAME_URL_MIDDLE_EAST);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_MIDDLE_EAST);
                 break;
             case R.id.nav_europe:
-                getArrListCatrgory("Europe");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Europe");
+                getArrListCatrgory(NAME_URL_EUROPE);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_EUROPE);
                 break;
             case R.id.nav_americas:
-                getArrListCatrgory("Americas");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Americas");
+                getArrListCatrgory(NAME_URL_AMERICAS);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_AMERICAS);
                 break;
             case R.id.nav_science_technology:
-                getArrListCatrgory("Science & Technology");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Science & Technology");
+                getArrListCatrgory(NAME_URL_SCIENCE_TECHNOLOGY);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_SCIENCE_TECHNOLOGY);
                 break;
             case R.id.nav_economy:
-                getArrListCatrgory("Economy");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Economy");
+                getArrListCatrgory(NAME_URL_ECONOMY);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ECONOMY);
                 break;
             case R.id.nav_health:
-                getArrListCatrgory("Health");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Health");
+                getArrListCatrgory(NAME_URL_HEALTH);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_HEALTH);
                 break;
             case R.id.nav_arts_entertainment:
-                getArrListCatrgory("Arts & Entertainment");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Arts & Entertainment");
+                getArrListCatrgory(NAME_URL_ARTS_ENTERTAINMENT);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ARTS_ENTERTAINMENT);
                 break;
             case R.id.nav_usa_vote:
-                getArrListCatrgory("2016 USA Votes");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "2016 USA Votes");
+                getArrListCatrgory(NAME_URL_2016_USA_VOTES);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_2016_USA_VOTES);
                 break;
             case R.id.nav_features:
-                getArrListCatrgory("One-Minute Features");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "One-Minute Features");
+                getArrListCatrgory(NAME_URL_ONE_MINUTE_FEATURES);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ONE_MINUTE_FEATURES);
                 break;
             case R.id.nav_voa_editors_picks:
-                getArrListCatrgory("VOA Editors Picks");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "VOA Editors Picks");
+                getArrListCatrgory(NAME_URL_VOA_EDITORS_PICKS);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_VOA_EDITORS_PICKS);
                 break;
             case R.id.nav_day_in_photo:
-                getArrListCatrgory("Day in Photos");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Day in Photos");
+                getArrListCatrgory(NAME_URL_DAY_IN_PHOTOS);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_DAY_IN_PHOTOS);
                 break;
             case R.id.nav_extra_time:
-                getArrListCatrgory("Shaka: Extra Time");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Shaka: Extra Time");
+                getArrListCatrgory(NAME_URL_SHAKA_EXTRA_TIME);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_SHAKA_EXTRA_TIME);
                 break;
             case R.id.nav_visiting:
-                getArrListCatrgory("Visiting the USA");
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, "Visiting the USA");
+                getArrListCatrgory(NAME_URL_VISITING_THE_USA);
+                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_VISITING_THE_USA);
                 break;
             case R.id.nav_exit:
-                fr = new FragmentMain(informations);
+                fr = new FragmentMain(information);
                 break;
             case R.id.nav_deleteDatabase:
                 database.delete_Database(sqLiteDatabase);
-                fr = new FragmentMain(informations);
+                fr = new FragmentMain(information);
                 break;
             default:
-                fr = new FragmentMain(informations);
+                fr = new FragmentMain(information);
                 break;
         }
         FragmentManager fm = getFragmentManager();
@@ -283,7 +286,6 @@ public class MainActivity extends AppCompatActivity
                 categoryArrList = posts.getDataArrayList();
                 break;
             }
-
         }
     }
 }

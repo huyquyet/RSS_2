@@ -8,21 +8,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import framgia.vn.readrss.R;
-import framgia.vn.readrss.models.Informations;
+import framgia.vn.readrss.models.Information;
 
-
-/**
- * Created by FRAMGIA\nguyen.huy.quyet on 17/03/2016.
- */
 public class FragmentMain extends Fragment {
-    private Informations informations = new Informations();
+    private Information informations = new Information();
     TextView textViewMainTitle, textViewMainLink,
             textViewMainDescription, textViewMainLanguage,
             textViewMainCopyright, textViewMainTtl,
             textViewMainLastBuildDate, textViewMainGenerator,
             textViewMainAtom;
 
-    public FragmentMain(Informations informations) {
+    public FragmentMain(Information informations) {
         this.informations = informations;
     }
 
@@ -46,7 +42,7 @@ public class FragmentMain extends Fragment {
         textViewMainAtom = (TextView) view.findViewById(R.id.textView_main_atom);
     }
 
-    private void setDataControl(Informations informations) {
+    private void setDataControl(Information informations) {
         textViewMainTitle.setText(informations.getTitle());
         textViewMainLink.setText(informations.getLink());
         textViewMainDescription.setText(informations.getDescription());
