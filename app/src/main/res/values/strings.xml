@@ -23,6 +23,7 @@
     <string name="nav_exit">Exit</string>
     <string name="nav_deleteDatabase">Delete database</string>
     <string name="nav_setting">Setting</string>
+    <!-- Fragment Main Text -->
     <string name="fragment_main_text">Main Fragment</string>
     <string name="fragment_main_title">Title : </string>
     <string name="fragment_main_link">Link : </string>
@@ -33,6 +34,12 @@
     <string name="fragment_main_lastBuildDate">LastBuildDate : </string>
     <string name="fragment_main_generator">Generator : </string>
     <string name="fragment_main_atom">Atom : </string>
+    <!-- Fragment List Post Text -->
     <string name="fragment_list_post_text">List Fragment</string>
+    <!-- Fragment Detail Post Text -->
     <string name="fragment_detail_post_text">Detail Fragment</string>
+    <string name="fragment_detail_post_author_title">Author : </string>
+    <string name="fragment_detail_post_pubDate_title">Time : </string>
+    <string name="fragment_detail_post_category_title">Category : </string>
+
 </resources>

@@ -29,7 +29,7 @@ public class FragmentListPost extends Fragment {
     private TextView textViewName;
     private String namelist;
 
-    public FragmentListPost(List<Data> dataArrayList, Activity context, String nameList) {
+    public FragmentListPost(Activity context, List<Data> dataArrayList, String nameList) {
         this.dataArrayList = dataArrayList;
         this.context = context;
         this.namelist = nameList;

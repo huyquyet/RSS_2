@@ -49,29 +49,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setToolbar();
-        database = new Database(this);
-        //  Open connect database
-        sqLiteDatabase = connectDataBase();
-        if (sqLiteDatabase != null) //  if database !+ null
-            //  Insert new database
-            database.insertDataBase(sqLiteDatabase);
-        readRssAsyncTask = new ReadRssAsyncTask(this);
-        if (checkInternetConnection()) { // Check connection Internet
-            LinkUrl linkUrl = new LinkUrl();
-            urlArrayList = linkUrl.getUrlArrayList();
-            readRssAsyncTask.execute(urlArrayList);
-            readRssAsyncTask.setUpdate(new ReadRssAsyncTask.UpdateData() {
-                @Override
-                public boolean updateData(boolean update) {
-                    if (update) {
-                        getData();
-                        updateInformation(information);
-                        updatePost(listPosts);
-                    }
-                    return false;
-                }
-            });
-        }
+        getData();
     }
 
     @Override
@@ -135,6 +113,34 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    private void getData() {
+        database = new Database(this);
+        //  Open connect database
+        sqLiteDatabase = connectDataBase();
+        if (sqLiteDatabase != null) //  if database !+ null
+            //  Insert new database
+            database.insertDataBase(sqLiteDatabase);
+        readRssAsyncTask = new ReadRssAsyncTask(this);
+        if (checkInternetConnection()) { // Check connection Internet
+            LinkUrl linkUrl = new LinkUrl();
+            urlArrayList = linkUrl.getUrlArrayList();
+            readRssAsyncTask.execute(urlArrayList);
+            readRssAsyncTask.setUpdate(new ReadRssAsyncTask.UpdateData() {
+                @Override
+                public boolean updateData(boolean update) {
+                    if (update) {
+                        information = readRssAsyncTask.getInformations();
+                        setFragmentMain();
+                        listPosts = readRssAsyncTask.getListPosts();
+                        updateInformation(information);
+                        updatePost(listPosts);
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
     private boolean checkInternetConnection() {
         int TypeWifi = ConnectivityManager.TYPE_WIFI;
         int TypeMobile = ConnectivityManager.TYPE_MOBILE;
@@ -167,12 +173,6 @@ public class MainActivity extends AppCompatActivity
         return Database;
     }
 
-    private void getData() {
-        this.information = readRssAsyncTask.getInformations();
-        setFragment();
-        this.listPosts = readRssAsyncTask.getListPosts();
-    }
-
     private void updateInformation(Information data) {
         sqLiteDatabase = connectDataBase();
         if (sqLiteDatabase != null) {
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setFragment() {
+    private void setFragmentMain() {
         // get fragment manager
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -200,67 +200,67 @@ public class MainActivity extends AppCompatActivity
         switch (idItem) {
             case R.id.nav_usa:
                 getArrListCatrgory(NAME_URL_USA);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_USA);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_USA);
                 break;
             case R.id.nav_africa:
                 getArrListCatrgory(NAME_URL_AFRICA);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_AFRICA);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_AFRICA);
                 break;
             case R.id.nav_asia:
                 getArrListCatrgory(NAME_URL_ASIA);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ASIA);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_ASIA);
                 break;
             case R.id.nav_middle_east:
                 getArrListCatrgory(NAME_URL_MIDDLE_EAST);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_MIDDLE_EAST);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_MIDDLE_EAST);
                 break;
             case R.id.nav_europe:
                 getArrListCatrgory(NAME_URL_EUROPE);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_EUROPE);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_EUROPE);
                 break;
             case R.id.nav_americas:
                 getArrListCatrgory(NAME_URL_AMERICAS);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_AMERICAS);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_AMERICAS);
                 break;
             case R.id.nav_science_technology:
                 getArrListCatrgory(NAME_URL_SCIENCE_TECHNOLOGY);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_SCIENCE_TECHNOLOGY);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_SCIENCE_TECHNOLOGY);
                 break;
             case R.id.nav_economy:
                 getArrListCatrgory(NAME_URL_ECONOMY);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ECONOMY);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_ECONOMY);
                 break;
             case R.id.nav_health:
                 getArrListCatrgory(NAME_URL_HEALTH);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_HEALTH);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_HEALTH);
                 break;
             case R.id.nav_arts_entertainment:
                 getArrListCatrgory(NAME_URL_ARTS_ENTERTAINMENT);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ARTS_ENTERTAINMENT);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_ARTS_ENTERTAINMENT);
                 break;
             case R.id.nav_usa_vote:
                 getArrListCatrgory(NAME_URL_2016_USA_VOTES);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_2016_USA_VOTES);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_2016_USA_VOTES);
                 break;
             case R.id.nav_features:
                 getArrListCatrgory(NAME_URL_ONE_MINUTE_FEATURES);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_ONE_MINUTE_FEATURES);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_ONE_MINUTE_FEATURES);
                 break;
             case R.id.nav_voa_editors_picks:
                 getArrListCatrgory(NAME_URL_VOA_EDITORS_PICKS);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_VOA_EDITORS_PICKS);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_VOA_EDITORS_PICKS);
                 break;
             case R.id.nav_day_in_photo:
                 getArrListCatrgory(NAME_URL_DAY_IN_PHOTOS);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_DAY_IN_PHOTOS);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_DAY_IN_PHOTOS);
                 break;
             case R.id.nav_extra_time:
                 getArrListCatrgory(NAME_URL_SHAKA_EXTRA_TIME);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_SHAKA_EXTRA_TIME);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_SHAKA_EXTRA_TIME);
                 break;
             case R.id.nav_visiting:
                 getArrListCatrgory(NAME_URL_VISITING_THE_USA);
-                fr = new FragmentListPost(categoryArrList, MainActivity.this, NAME_URL_VISITING_THE_USA);
+                fr = new FragmentListPost(MainActivity.this, categoryArrList, NAME_URL_VISITING_THE_USA);
                 break;
             case R.id.nav_exit:
                 fr = new FragmentMain(information);
