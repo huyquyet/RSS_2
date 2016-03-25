@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:title="@string/nav_home" />
+        <item
+            android:id="@+id/nav_usa"
+            android:title="@string/nav_usa" />
+        <item
+            android:id="@+id/nav_africa"
+            android:title="@string/nav_africa" />
+        <item
+            android:id="@+id/nav_asia"
+            android:title="@string/nav_asia" />
+        <item
+            android:id="@+id/nav_middle_east"
+            android:title="@string/nav_middle_east" />
+        <item
+            android:id="@+id/nav_europe"
+            android:title="@string/nav_europe" />
+        <item
+            android:id="@+id/nav_americas"
+            android:title="@string/nav_americas" />
+        <item
+            android:id="@+id/nav_science_technology"
+            android:title="@string/nav_science_technology" />
+        <item
+            android:id="@+id/nav_economy"
+            android:title="@string/nav_economy" />
+        <item
+            android:id="@+id/nav_health"
+            android:title="@string/nav_health" />
+        <item
+            android:id="@+id/nav_arts_entertainment"
+            android:title="@string/nav_arts_entertainment" />
+        <item
+            android:id="@+id/nav_usa_vote"
+            android:title="@string/nav_usa_vote" />
+        <item
+            android:id="@+id/nav_features"
+            android:title="@string/nav_features" />
+        <item
+            android:id="@+id/nav_voa_editors_picks"
+            android:title="@string/nav_voa_editors_picks" />
+        <item
+            android:id="@+id/nav_day_in_photo"
+            android:title="@string/nav_day_in_photo" />
+        <item
+            android:id="@+id/nav_extra_time"
+            android:title="@string/nav_extra_time" />
+        <item
+            android:id="@+id/nav_visiting"
+            android:title="@string/nav_visiting" />
+    </group>
+    <item android:title="@string/nav_setting">
+        <menu>
+            <item
+                android:id="@+id/nav_exit"
+                android:title="@string/nav_exit" />
+            <item
+                android:id="@+id/nav_deleteDatabase"
+                android:title="@string/nav_deleteDatabase" />
+
+        </menu>
+    </item>
+</menu>

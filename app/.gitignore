@@ -12,17 +12,9 @@ gradle.properties
 *.ipr
 .idea/
 .gradle/
+local.properties
 
-proguard-rules.pro
-gradlew
-gradlew.bat
-settings.gradle
-build.gradle
 */build/
-gradle/
 
 *~
 *.swp
-app/src/androidTest/
-app/src/test/
-
