@@ -3,7 +3,7 @@ package framgia.vn.readrss.stringInterface;
 /**
  * Created by FRAMGIA\nguyen.huy.quyet on 24/03/2016.
  */
-public interface noteXml {
+public interface NoteXml {
     /**
      * Xml Information
      */
