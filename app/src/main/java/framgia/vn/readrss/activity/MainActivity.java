@@ -1,5 +1,9 @@
 package framgia.vn.readrss.activity;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,18 +17,42 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import framgia.vn.readrss.R;
+import framgia.vn.readrss.activity.fragment.FragmentListPost;
+import framgia.vn.readrss.activity.fragment.FragmentMain;
+import framgia.vn.readrss.controller.Connection;
+import framgia.vn.readrss.controller.Database;
+import framgia.vn.readrss.controller.ReadRssAsyncTask;
+import framgia.vn.readrss.models.Data;
+import framgia.vn.readrss.models.Information;
+import framgia.vn.readrss.models.LinkUrl;
+import framgia.vn.readrss.models.ListData;
 import framgia.vn.readrss.stringInterface.ConstDB;
 import framgia.vn.readrss.stringInterface.Url;
 
+;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ConstDB, Url {
+    final static private int REPLACE = 1;
+    final static private int ADD = 0;
+    private List<ListData> mListPosts;
+    private Information mInformation;
+    private List<Data> mCategoryArrList;
+    private List<LinkUrl> mUrlArrayList;
+    private ReadRssAsyncTask mReadRssAsyncTask;
+    private Database mDatabase = null;
+    private SQLiteDatabase mSqLiteDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setToolbar();
+        getData();
     }
 
     @Override
@@ -61,8 +89,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//        selectFrag(id);
+        int id = item.getItemId();
+        selectFrag(id);
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
@@ -86,5 +114,141 @@ public class MainActivity extends AppCompatActivity
         mToggle.syncState();
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void getData() {
+        mDatabase = new Database(this);
+        //  Open connect mDatabase
+        mSqLiteDatabase = mDatabase.connectDataBase();
+        if (mSqLiteDatabase != null) //  if mDatabase !+ null
+            //  Insert new mDatabase
+            mDatabase.insertDataBase(mSqLiteDatabase);
+        mReadRssAsyncTask = new ReadRssAsyncTask(this);
+        if (Connection.checkInternetConnection(MainActivity.this)) { // Check connection Internet
+            LinkUrl linkUrl = new LinkUrl();
+            mUrlArrayList = linkUrl.getUrlArrayList();
+            mReadRssAsyncTask.execute(mUrlArrayList);
+            mReadRssAsyncTask.setUpdate(new ReadRssAsyncTask.UpdateData() {
+                @Override
+                public boolean updateData(boolean update) {
+                    if (update) {
+                        mInformation = mReadRssAsyncTask.getInformation();
+                        mListPosts = mReadRssAsyncTask.getListPosts();
+//                        updateInformation(mInformation);
+//                        updatePost(mListPosts);
+                    }
+                    return false;
+                }
+            });
+        }
+        setFragmentMain();
+    }
+
+    private void setFragment(Fragment fr, int check) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        if (check == REPLACE) {
+            fragmentTransaction.replace(R.id.fragment, fr);
+        } else if (check == ADD) {
+            fragmentTransaction.add(R.id.fragment, fr);
+        }
+        fragmentTransaction.commit();
+    }
+
+    private void setFragmentMain() {
+        // get fragment manager
+        setFragment(new FragmentMain(mInformation), ADD);
+    }
+
+    private void selectFrag(int idItem) {
+        Fragment fr;
+        switch (idItem) {
+            case R.id.nav_usa:
+                getArrListCategory(NAME_URL_USA);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_USA);
+                break;
+            case R.id.nav_africa:
+                getArrListCategory(NAME_URL_AFRICA);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_AFRICA);
+                break;
+            case R.id.nav_asia:
+                getArrListCategory(NAME_URL_ASIA);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_ASIA);
+                break;
+            case R.id.nav_middle_east:
+                getArrListCategory(NAME_URL_MIDDLE_EAST);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_MIDDLE_EAST);
+                break;
+            case R.id.nav_europe:
+                getArrListCategory(NAME_URL_EUROPE);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_EUROPE);
+                break;
+            case R.id.nav_americas:
+                getArrListCategory(NAME_URL_AMERICAS);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_AMERICAS);
+                break;
+            case R.id.nav_science_technology:
+                getArrListCategory(NAME_URL_SCIENCE_TECHNOLOGY);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_SCIENCE_TECHNOLOGY);
+                break;
+            case R.id.nav_economy:
+                getArrListCategory(NAME_URL_ECONOMY);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_ECONOMY);
+                break;
+            case R.id.nav_health:
+                getArrListCategory(NAME_URL_HEALTH);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_HEALTH);
+                break;
+            case R.id.nav_arts_entertainment:
+                getArrListCategory(NAME_URL_ARTS_ENTERTAINMENT);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_ARTS_ENTERTAINMENT);
+                break;
+            case R.id.nav_usa_vote:
+                getArrListCategory(NAME_URL_2016_USA_VOTES);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_2016_USA_VOTES);
+                break;
+            case R.id.nav_features:
+                getArrListCategory(NAME_URL_ONE_MINUTE_FEATURES);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_ONE_MINUTE_FEATURES);
+                break;
+            case R.id.nav_voa_editors_picks:
+                getArrListCategory(NAME_URL_VOA_EDITORS_PICKS);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_VOA_EDITORS_PICKS);
+                break;
+            case R.id.nav_day_in_photo:
+                getArrListCategory(NAME_URL_DAY_IN_PHOTOS);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_DAY_IN_PHOTOS);
+                break;
+            case R.id.nav_extra_time:
+                getArrListCategory(NAME_URL_SHAKA_EXTRA_TIME);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_SHAKA_EXTRA_TIME);
+                break;
+            case R.id.nav_visiting:
+                getArrListCategory(NAME_URL_VISITING_THE_USA);
+                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_VISITING_THE_USA);
+                break;
+            case R.id.nav_exit:
+                fr = new FragmentMain(mInformation);
+                break;
+            case R.id.nav_deleteDatabase:
+                mDatabase.delete_Database(mSqLiteDatabase);
+                fr = new FragmentMain(mInformation);
+                break;
+            default:
+                fr = new FragmentMain(mInformation);
+                break;
+        }
+        setFragment(fr, REPLACE);
+    }
+
+    private void getArrListCategory(String category) {
+        mCategoryArrList = new ArrayList<>();
+        for (ListData posts : mListPosts) {
+            if (!posts.getCategory().equalsIgnoreCase(category.trim())) continue;
+            else {
+                mCategoryArrList = posts.getDataArrayList();
+                break;
+            }
+        }
     }
 }

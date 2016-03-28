@@ -21,6 +21,18 @@ public class Database implements ConstDB {
         this.mContext = context;
     }
 
+    public SQLiteDatabase connectDataBase() {
+        SQLiteDatabase Database = null;
+        try {
+            /**
+             * Mo CSDL neu ko co thi tao moi
+             */
+            Database = mContext.openOrCreateDatabase(NAME_DATABASE, SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        } catch (Exception ex) {
+        }
+        return Database;
+    }
+
     private boolean isDatabaseExists(SQLiteDatabase database, String tableName) {
         String query = "Select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'";
         mCursor = database.rawQuery(query, null);
