@@ -119,29 +119,58 @@ public class MainActivity extends AppCompatActivity
     private void getData() {
         mDatabase = new Database(this);
         //  Open connect mDatabase
-        mSqLiteDatabase = mDatabase.connectDataBase();
-        if (mSqLiteDatabase != null) //  if mDatabase !+ null
+        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
+        if (mSqLiteDatabase != null) {
+            //  if mDatabase != null
             //  Insert new mDatabase
             mDatabase.insertDataBase(mSqLiteDatabase);
-        mReadRssAsyncTask = new ReadRssAsyncTask(this);
-        if (Connection.checkInternetConnection(MainActivity.this)) { // Check connection Internet
-            LinkUrl linkUrl = new LinkUrl();
-            mUrlArrayList = linkUrl.getUrlArrayList();
-            mReadRssAsyncTask.execute(mUrlArrayList);
-            mReadRssAsyncTask.setUpdate(new ReadRssAsyncTask.UpdateData() {
-                @Override
-                public boolean updateData(boolean update) {
-                    if (update) {
-                        mInformation = mReadRssAsyncTask.getInformation();
-                        mListPosts = mReadRssAsyncTask.getListPosts();
-//                        updateInformation(mInformation);
-//                        updatePost(mListPosts);
-                    }
-                    return false;
-                }
-            });
+            if (Connection.checkInternetConnection(MainActivity.this)) {
+                // Check connection Internet
+                getDataFromLinkRss();
+
+            } else {
+                getInformationFromDataBase();
+                getPostsFromDataBase();
+                setFragmentMain();
+            }
         }
-        setFragmentMain();
+    }
+
+    private void getDataFromLinkRss() {
+        LinkUrl linkUrl = new LinkUrl();
+        mReadRssAsyncTask = new ReadRssAsyncTask(this);
+        mUrlArrayList = linkUrl.getUrlArrayList();
+        mReadRssAsyncTask.execute(mUrlArrayList);
+        mReadRssAsyncTask.setUpdate(new ReadRssAsyncTask.UpdateData() {
+            @Override
+            public boolean updateData(boolean update) {
+                if (!update) return false;
+                List<ListData> listPosts;
+                Information information;
+                information = mReadRssAsyncTask.getInformation();
+                listPosts = mReadRssAsyncTask.getListPosts();
+                updateInformation(information);
+                updatePost(listPosts);
+                getInformationFromDataBase();
+                getPostsFromDataBase();
+                setFragmentMain();
+                return false;
+            }
+        });
+    }
+
+    private void getInformationFromDataBase() {
+        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
+        if (mSqLiteDatabase != null) {
+            mInformation = mDatabase.returnDataInformation(mSqLiteDatabase);
+        }
+    }
+
+    private void getPostsFromDataBase() {
+        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
+        if (mSqLiteDatabase != null) {
+            mListPosts = mDatabase.returnDataPost(mSqLiteDatabase);
+        }
     }
 
     private void setFragment(Fragment fr, int check) {
@@ -245,10 +274,22 @@ public class MainActivity extends AppCompatActivity
         mCategoryArrList = new ArrayList<>();
         for (ListData posts : mListPosts) {
             if (!posts.getCategory().equalsIgnoreCase(category.trim())) continue;
-            else {
-                mCategoryArrList = posts.getDataArrayList();
-                break;
-            }
+            mCategoryArrList = posts.getDataArrayList();
+            break;
+        }
+    }
+
+    private void updateInformation(Information data) {
+        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
+        if (mSqLiteDatabase != null) {
+            mDatabase.insertOrUpdateDataInformation(mSqLiteDatabase, data);
+        }
+    }
+
+    private void updatePost(List<ListData> data) {
+        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
+        if (mSqLiteDatabase != null) {
+            mDatabase.insertOrUpdateDataPost(mSqLiteDatabase, data);
         }
     }
 }

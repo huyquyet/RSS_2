@@ -30,7 +30,7 @@ public interface ConstDB {
     public static final String COL_INFORMATION_LANGUAGE = "language";
     public static final String COL_INFORMATION_COPYRIGHT = "copyright";
     public static final String COL_INFORMATION_TTL = "ttl";
-    public static final String COL_INFORMATION_LASTBUILDATE = "lastBuildDate";
+    public static final String COL_INFORMATION_LAST_BUILD_DATE = "lastBuildDate";
     public static final String COL_INFORMATION_GENERATOR = "generator";
     public static final String COL_INFORMATION_ATOM = "atom";
 
@@ -68,7 +68,7 @@ public interface ConstDB {
             COL_INFORMATION_LANGUAGE + " text, " +
             COL_INFORMATION_COPYRIGHT + " text, " +
             COL_INFORMATION_TTL + " text, " +
-            COL_INFORMATION_LASTBUILDATE + " text," +
+            COL_INFORMATION_LAST_BUILD_DATE + " text," +
             COL_INFORMATION_GENERATOR + " text, " +
             COL_INFORMATION_ATOM + " text)";
     public static final String SQL_POST = "create table " + TBL_POST + " (" +

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import framgia.vn.readrss.R;
 import framgia.vn.readrss.models.Data;
 
@@ -38,7 +40,9 @@ public class FragmentDetailPost extends Fragment {
         mTextViewPubDate.setText(mItem.getPubDate());
         mTextViewAuthor.setText(mItem.getAuthor());
         mTextViewCategory.setText(mCategory);
-//        Glide.with(this).load(mItem.getEnclosure()).into(mImageViewEnclosure);
+        Glide.with(this).load(mItem.getEnclosure()).into(mImageViewEnclosure);
+
+//        mTextViewLink.setOnClickListener();
         return mView;
     }
 
@@ -54,4 +58,6 @@ public class FragmentDetailPost extends Fragment {
         mImageViewEnclosure = (ImageView) view.findViewById(R.id.imageView_fragment_detail_post_enclosure);
 
     }
+
+
 }
