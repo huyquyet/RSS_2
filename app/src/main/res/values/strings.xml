@@ -44,4 +44,6 @@
     <string name="fragment_detail_post_link_title">Link bai viet : </string>
     <!-- Record limit query tblPost -->
     <string name="limit_query_tblPost">20</string>
+    <!-- String Menu -->
+    <string name="menu_click_link">Open link</string>
 </resources>

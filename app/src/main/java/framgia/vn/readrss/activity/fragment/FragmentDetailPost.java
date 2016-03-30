@@ -1,6 +1,10 @@
 package framgia.vn.readrss.activity.fragment;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,12 @@ public class FragmentDetailPost extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_detail_post, container, false);
         getControl(mView);
@@ -41,8 +51,12 @@ public class FragmentDetailPost extends Fragment {
         mTextViewAuthor.setText(mItem.getAuthor());
         mTextViewCategory.setText(mCategory);
         Glide.with(this).load(mItem.getEnclosure()).into(mImageViewEnclosure);
-
-//        mTextViewLink.setOnClickListener();
+        mTextViewLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextViewLinkClick();
+            }
+        });
         return mView;
     }
 
@@ -59,5 +73,24 @@ public class FragmentDetailPost extends Fragment {
 
     }
 
-
+    private void TextViewLinkClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Open Link");
+        builder.setMessage("Open link by Browser");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(mItem.getLink()));
+                startActivity(intent);
+            }
+        });
+        builder.create().show();
+    }
 }
