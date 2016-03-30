@@ -140,7 +140,7 @@ public final class Database implements ConstDB {
         List<ListData> result = new ArrayList<>();
         int limit = returnLimitQueryTblPost();
         for (Category cate : mCategory.getCategoryArrayList()) {
-            result.add(returnPostsOfCategory(sqLiteDatabase, cate.getName(), 0, limit));
+            result.add(returnPostsOfCategory(sqLiteDatabase, cate.getName(), 0, 10));
         }
         return result;
     }
@@ -159,11 +159,11 @@ public final class Database implements ConstDB {
         result.setCategory(category);
         Data post;
         String limit = start + "," + number;
-        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, COL_POST_ID, "20");
+        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, COL_POST_ID, limit);
 //        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, null, null);
         mCursor.moveToFirst();
         while (!mCursor.isAfterLast()) {
-            post =new Data();
+            post = new Data();
             post.setId(mCursor.getString(0));
             post.setTitle(mCursor.getString(1));
             post.setDescription(mCursor.getString(2));
