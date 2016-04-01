@@ -41,7 +41,6 @@ public class FragmentDetailPost extends Fragment {
         mTextViewAuthor.setText(mItem.getAuthor());
         mTextViewCategory.setText(mCategory);
         Glide.with(this).load(mItem.getEnclosure()).into(mImageViewEnclosure);
-
 //        mTextViewLink.setOnClickListener();
         return mView;
     }
@@ -56,8 +55,5 @@ public class FragmentDetailPost extends Fragment {
         mTextViewAuthor = (TextView) view.findViewById(R.id.textView_fragment_detail_post_author);
         mTextViewCategory = (TextView) view.findViewById(R.id.textView_fragment_detail_post_category);
         mImageViewEnclosure = (ImageView) view.findViewById(R.id.imageView_fragment_detail_post_enclosure);
-
     }
-
-
 }

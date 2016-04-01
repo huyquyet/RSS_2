@@ -118,7 +118,6 @@
                     android:textColor="@android:color/holo_blue_dark" />
             </LinearLayout>
 
-
             <TextView
                 android:id="@+id/textView_fragment_detail_post_guid"
                 android:layout_width="match_parent"

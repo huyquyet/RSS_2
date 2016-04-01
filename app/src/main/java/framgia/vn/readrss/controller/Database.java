@@ -29,6 +29,19 @@ public final class Database implements ConstDB {
         this.mContext = context;
     }
 
+    private boolean isDatabaseExists(SQLiteDatabase database, String tableName) {
+        String query = "Select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'";
+        mCursor = database.rawQuery(query, null);
+        if (mCursor != null) {
+            if (mCursor.getCount() > 0) {
+                mCursor.close();
+                return true;
+            }
+            mCursor.close();
+        }
+        return false;
+    }
+
     public void insertDataBase(SQLiteDatabase database) {
         try {
             if (database != null) {
@@ -163,7 +176,7 @@ public final class Database implements ConstDB {
 //        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, null, null);
         mCursor.moveToFirst();
         while (!mCursor.isAfterLast()) {
-            post =new Data();
+            post = new Data();
             post.setId(mCursor.getString(0));
             post.setTitle(mCursor.getString(1));
             post.setDescription(mCursor.getString(2));
@@ -186,19 +199,6 @@ public final class Database implements ConstDB {
 
     private void displayToast(String display) {
         Toast.makeText(mContext, display, Toast.LENGTH_SHORT).show();
-    }
-
-    private boolean isDatabaseExists(SQLiteDatabase database, String tableName) {
-        String query = "Select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'";
-        mCursor = database.rawQuery(query, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.close();
-                return true;
-            }
-            mCursor.close();
-        }
-        return false;
     }
 
     private void insertDataCategoryPost(SQLiteDatabase database) {
