@@ -21,8 +21,8 @@ public class ListData {
         return mDataArrayList;
     }
 
-    public void setDataArrayList(Data mDataArrayList) {
-        this.mDataArrayList.add(mDataArrayList);
+    public void setDataArrayList(Data data) {
+        this.mDataArrayList.add(data);
     }
 
     public String getCategory() {
