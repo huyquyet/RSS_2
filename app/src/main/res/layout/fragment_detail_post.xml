@@ -134,6 +134,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center" />
+
+            <Button
+                android:id="@+id/button_share_facebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share Facbook" />
+
+            <com.facebook.share.widget.ShareButton
+                android:id="@+id/share_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="share" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

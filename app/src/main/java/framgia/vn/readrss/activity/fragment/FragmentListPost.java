@@ -26,8 +26,9 @@ import framgia.vn.readrss.controller.Connection;
 import framgia.vn.readrss.controller.Database;
 import framgia.vn.readrss.models.Data;
 import framgia.vn.readrss.models.ListData;
+import framgia.vn.readrss.stringInterface.ConstQuery;
 
-public class FragmentListPost extends Fragment {
+public class FragmentListPost extends Fragment implements ConstQuery {
     private List<Data> mDataArrayList = new ArrayList<>();
     private Data mItemSelect = null;
     private ListView mListViewPost;
@@ -92,7 +93,7 @@ public class FragmentListPost extends Fragment {
                 previousTotalItemCount = totalItemCount;
             }
             if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
-                if (mDataArrayList.size() % 10 == 0 && !mCheckEndScroll)
+                if (mDataArrayList.size() % LIMIT_QUERY_LIST_POST == 0 && !mCheckEndScroll)
                     new loadMoreData().execute(mDataArrayList.size());
                 else {
                     Toast.makeText(mContext, "het du lieu", Toast.LENGTH_SHORT).show();
@@ -111,12 +112,6 @@ public class FragmentListPost extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            // Showing progress dialog before sending http request
-//            mDialog = new ProgressDialog(mContext);
-//            mDialog.setMessage("Please wait..");
-//            mDialog.setIndeterminate(true);
-//            mDialog.setCancelable(false);
-//            mDialog.show();
         }
 
         @Override
@@ -127,9 +122,7 @@ public class FragmentListPost extends Fragment {
                 e.printStackTrace();
             }
             SQLiteDatabase sqLiteDatabase = Connection.connectDataBase(mContext);
-            int start = params[0];
-            int number = 10;
-            return mDatabase.returnPostsOfCategory(sqLiteDatabase, mNameList, start, number);
+            return mDatabase.returnPostsOfCategory(sqLiteDatabase, mNameList, params[0], LIMIT_QUERY_LIST_POST);
         }
 
         @Override
@@ -140,7 +133,6 @@ public class FragmentListPost extends Fragment {
         @Override
         protected void onPostExecute(ListData listData) {
             super.onPostExecute(listData);
-//            mDialog.dismiss();
             if (listData.getDataArrayList().size() == 0) mCheckEndScroll = true;
             else {
                 for (Data data : listData.getDataArrayList()) {

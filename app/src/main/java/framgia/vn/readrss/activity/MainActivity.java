@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.facebook.FacebookSdk;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,8 @@ import framgia.vn.readrss.models.LinkUrl;
 import framgia.vn.readrss.models.ListData;
 import framgia.vn.readrss.stringInterface.ConstDB;
 import framgia.vn.readrss.stringInterface.Url;
+
+;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ConstDB, Url {
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setToolbar();
+        FacebookSdk.sdkInitialize(getApplicationContext());
         getData();
     }
 
@@ -119,11 +124,8 @@ public class MainActivity extends AppCompatActivity
         //  Open connect mDatabase
         mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
         if (mSqLiteDatabase != null) {
-            //  if mDatabase != null
-            //  Insert new mDatabase
             mDatabase.insertDataBase(mSqLiteDatabase);
             if (Connection.checkInternetConnection(MainActivity.this)) {
-                // Check connection Internet
                 getDataFromLinkRss();
 
             } else {
@@ -158,17 +160,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getInformationFromDataBase() {
-        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
-        if (mSqLiteDatabase != null) {
-            mInformation = mDatabase.returnDataInformation(mSqLiteDatabase);
-        }
+        mInformation = mDatabase.returnDataInformation();
     }
 
     private void getPostsFromDataBase() {
-        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
-        if (mSqLiteDatabase != null) {
-            mListPosts = mDatabase.returnDataPost(mSqLiteDatabase);
-        }
+        mListPosts = mDatabase.returnDataPost();
     }
 
     private void setFragment(Fragment fr, int check) {
@@ -278,16 +274,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateInformation(Information data) {
-        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
-        if (mSqLiteDatabase != null) {
-            mDatabase.insertOrUpdateDataInformation(mSqLiteDatabase, data);
-        }
+        mDatabase.insertOrUpdateDataInformation(data);
     }
 
     private void updatePost(List<ListData> data) {
-        mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
-        if (mSqLiteDatabase != null) {
-            mDatabase.insertOrUpdateDataPost(mSqLiteDatabase, data);
-        }
+        mDatabase.insertOrUpdateDataPost(data);
     }
 }

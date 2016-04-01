@@ -10,20 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import framgia.vn.readrss.R;
 import framgia.vn.readrss.models.Category;
 import framgia.vn.readrss.models.Data;
 import framgia.vn.readrss.models.Information;
 import framgia.vn.readrss.models.ListData;
 import framgia.vn.readrss.stringInterface.ConstDB;
+import framgia.vn.readrss.stringInterface.ConstQuery;
 
-public final class Database implements ConstDB {
+public final class Database implements ConstDB, ConstQuery {
     private static final int INSERT_ERROR = -1;
     private static final int ID_INFORMATION_ERROR = -1;
     private Activity mContext;
     private Cursor mCursor;
     private ContentValues mValues;
     private Category mCategory = new Category();
+    private SQLiteDatabase mSQLiteDatabase;
 
     public Database(Activity context) {
         this.mContext = context;
@@ -43,29 +44,23 @@ public final class Database implements ConstDB {
                      * Create table category
                      */
                     database.execSQL(SQL_CATEGORY);
-                    displayToast("Insert tblCategory success !");
                     /**
                      * Create table tblInformation
                      */
                     database.execSQL(SQL_INFORMATION);
-                    displayToast("Insert tblInformation success !");
                     /**
                      * Create table tblPost
                      */
                     database.execSQL(SQL_POST);
-                    displayToast("Insert tblPost success !");
                     /**
                      * Create table tblTimeUpdate
                      */
                     database.execSQL(SQL_TIMEUPDATE);
-                    displayToast("Insert tblTimeUpdate success !");
                     /**
                      * Create table tblCategoryPost
                      */
                     database.execSQL(SQL_CATEGORY_POST);
-                    displayToast("Insert tblCategoryPost success !");
                     insertDataCategoryPost(database);
-                    displayToast("Insert database success !");
                 }   // End if (!isDatabaseExists(database, TBL_POST))
             }   // End if(database != null)
             database.close();
@@ -76,72 +71,68 @@ public final class Database implements ConstDB {
 
     public void delete_Database(SQLiteDatabase database) {
         if (mContext.deleteDatabase(NAME_DATABASE)) {
-            displayToast("Delete data success !");
+            Toast.makeText(mContext, "Delete data success", Toast.LENGTH_SHORT).show();
         } else
-            displayToast(" Delete data error !");
+            Toast.makeText(mContext, "Delete data error", Toast.LENGTH_SHORT).show();
     }
 
-    public void insertOrUpdateDataPost(SQLiteDatabase sqLiteDatabase, List<ListData> data) {
-        if (checkDataTable(sqLiteDatabase, TBL_POST)) {
-            deletePostTimeLarger10Day(sqLiteDatabase);
-            updateDataPost(sqLiteDatabase, data);
-            sqLiteDatabase.close();
+    public void insertOrUpdateDataPost(List<ListData> data) {
+        if (!checkConnectDataBase()) return;
+        if (checkDataTable(mSQLiteDatabase, TBL_POST)) {
+            deletePostTimeLarger10Day(mSQLiteDatabase);
+            updateDataPost(mSQLiteDatabase, data);
         } else {
-            insertDataPost(sqLiteDatabase, data);
-            sqLiteDatabase.close();
+            insertDataPost(mSQLiteDatabase, data);
         }
+        closeConnectDataBase();
     }
 
-    public void insertOrUpdateDataInformation(SQLiteDatabase sqLiteDatabase, Information data) {
-        int idInformation = checkDataInformation(sqLiteDatabase);
+    public void insertOrUpdateDataInformation(Information data) {
+        if (!checkConnectDataBase()) return;
+        int idInformation = checkDataInformation(mSQLiteDatabase);
         if (idInformation != ID_INFORMATION_ERROR) {
             //  Exists data in table
-            updateDataInformation(sqLiteDatabase, data, idInformation);
-            sqLiteDatabase.close();
+            updateDataInformation(mSQLiteDatabase, data, idInformation);
         } else {
-            insertDataInformation(sqLiteDatabase, data);
-            sqLiteDatabase.close();
+            insertDataInformation(mSQLiteDatabase, data);
         }
+        closeConnectDataBase();
     }
 
     /**
-     * @param sqLiteDatabase
      * @return Object Information
      */
-    public Information returnDataInformation(SQLiteDatabase sqLiteDatabase) {
+    public Information returnDataInformation() {
         Information result = new Information();
-        mCursor = sqLiteDatabase.query(TBL_INFORMATION, null, null, null, null, null, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.moveToFirst();
-                result.setTitle(mCursor.getString(1));
-                result.setLink(mCursor.getString(2));
-                result.setDescription(mCursor.getString(3));
-                result.setImage(mCursor.getString(4));
-                result.setLanguage(mCursor.getString(5));
-                result.setCopyright(mCursor.getString(6));
-                result.setTtl(mCursor.getString(7));
-                result.setLastBuildDate(mCursor.getString(8));
-                result.setGenerator(mCursor.getString(9));
-                result.setAtom(mCursor.getString(10));
-                mCursor.close();
-                return result;
-            }
-            mCursor.close();
-        }
+        if (!checkConnectDataBase()) return result;
+        mCursor = mSQLiteDatabase.query(TBL_INFORMATION, null, null, null, null, null, null);
+        if (mCursor == null || mCursor.getCount() <= 0) return result;
+        mCursor.moveToFirst();
+        result.setTitle(mCursor.getString(1));
+        result.setLink(mCursor.getString(2));
+        result.setDescription(mCursor.getString(3));
+        result.setImage(mCursor.getString(4));
+        result.setLanguage(mCursor.getString(5));
+        result.setCopyright(mCursor.getString(6));
+        result.setTtl(mCursor.getString(7));
+        result.setLastBuildDate(mCursor.getString(8));
+        result.setGenerator(mCursor.getString(9));
+        result.setAtom(mCursor.getString(10));
+        mCursor.close();
         return result;
     }
 
     /**
-     * @param sqLiteDatabase
      * @return List<ListData> with 20 first record in ListData
      */
-    public List<ListData> returnDataPost(SQLiteDatabase sqLiteDatabase) {
+    public List<ListData> returnDataPost() {
         List<ListData> result = new ArrayList<>();
-        int limit = returnLimitQueryTblPost();
+        if (!checkConnectDataBase()) return result;
+        int limit = LIMIT_QUERY_LIST_POST; // So ban ghi lay ve trong 1 lan truy van
         for (Category cate : mCategory.getCategoryArrayList()) {
-            result.add(returnPostsOfCategory(sqLiteDatabase, cate.getName(), 0, 10));
+            result.add(returnPostsOfCategory(mSQLiteDatabase, cate.getName(), 0, limit));
         }
+        closeConnectDataBase();
         return result;
     }
 
@@ -160,7 +151,6 @@ public final class Database implements ConstDB {
         Data post;
         String limit = start + "," + number;
         mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, COL_POST_ID, limit);
-//        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, null, null);
         mCursor.moveToFirst();
         while (!mCursor.isAfterLast()) {
             post = new Data();
@@ -184,21 +174,22 @@ public final class Database implements ConstDB {
      * Function Private
      */
 
-    private void displayToast(String display) {
-        Toast.makeText(mContext, display, Toast.LENGTH_SHORT).show();
+    private boolean checkConnectDataBase() {
+        mSQLiteDatabase = Connection.connectDataBase(mContext);
+        if (mSQLiteDatabase != null) return true;
+        else return false;
+    }
+
+    private void closeConnectDataBase() {
+        if (mSQLiteDatabase != null) mSQLiteDatabase.close();
     }
 
     private boolean isDatabaseExists(SQLiteDatabase database, String tableName) {
         String query = "Select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'";
         mCursor = database.rawQuery(query, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.close();
-                return true;
-            }
-            mCursor.close();
-        }
-        return false;
+        if (mCursor == null || mCursor.getCount() <= 0) return false;
+        mCursor.close();
+        return true;
     }
 
     private void insertDataCategoryPost(SQLiteDatabase database) {
@@ -207,27 +198,22 @@ public final class Database implements ConstDB {
             mValues.put(COL_CATEGORY_NAME, category1.getName());
             long check = database.insert(TBL_CATEGORY, null, mValues);
             if (check == INSERT_ERROR) {
-                displayToast("Error insert data Category");
+                Toast.makeText(mContext, "Error insert data Category", Toast.LENGTH_SHORT).show();
                 delete_Database(database);
                 break;
             } else
                 mValues.clear();
         }
-        displayToast("Insert database CategoryPost success !");
+        Toast.makeText(mContext, "Insert database CategoryPost success !", Toast.LENGTH_SHORT).show();
     }
 
     private int checkDataInformation(SQLiteDatabase sqLiteDatabase) {
         int idInformation = ID_INFORMATION_ERROR;
         mCursor = sqLiteDatabase.query(TBL_INFORMATION, null, null, null, null, null, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.moveToFirst();
-                idInformation = Integer.parseInt(mCursor.getString(0));
-                mCursor.close();
-                return idInformation;
-            }
-            mCursor.close();
-        }
+        if (mCursor == null || mCursor.getCount() <= 0) return idInformation;
+        mCursor.moveToFirst();
+        idInformation = Integer.parseInt(mCursor.getString(0));
+        mCursor.close();
         return idInformation;
     }
 
@@ -240,14 +226,9 @@ public final class Database implements ConstDB {
      */
     private boolean checkDataTable(SQLiteDatabase sqLiteDatabase, String tableName) {
         mCursor = sqLiteDatabase.query(tableName, null, null, null, null, null, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.close();
-                return true;
-            }
-            mCursor.close();
-        }
-        return false;
+        if (mCursor == null || mCursor.getCount() <= 0) return false;
+        mCursor.close();
+        return true;
     }
 
     private ContentValues setContentValuesInformation(Information data) {
@@ -283,7 +264,6 @@ public final class Database implements ConstDB {
         int check = sqLiteDatabase.update(TBL_INFORMATION, values, COL_INFORMATION_ID + "=?", new String[]{String.valueOf(idInformation)});
         if (check > 0) {
             values.clear();
-//            Toast.makeText(context, "Update data Information success !", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(mContext, "Error update data Information !", Toast.LENGTH_SHORT).show();
             values.clear();
@@ -294,10 +274,10 @@ public final class Database implements ConstDB {
         ContentValues values = setContentValuesInformation(data);
         long check = sqLiteDatabase.insert(TBL_INFORMATION, null, values);
         if (check == -1) {
-            displayToast("Error insert data Information !");
+            Toast.makeText(mContext, "Error insert data Information !", Toast.LENGTH_SHORT).show();
             values.clear();
         } else {
-            displayToast("Insert data Information success !");
+            Toast.makeText(mContext, "Insert data Information success !", Toast.LENGTH_SHORT).show();
             values.clear();
         }
     }
@@ -316,7 +296,7 @@ public final class Database implements ConstDB {
             if (arrayList.getDataArrayList().size() > 0) listData.add(arrayList);
         }
         if (listData.size() > 0) insertDataPost(sqLiteDatabase, listData);
-        else displayToast("Update Data Success !");
+        else Toast.makeText(mContext, "Update Data Success !", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -326,18 +306,10 @@ public final class Database implements ConstDB {
      * @return
      */
     private boolean checkPostInDatabase(SQLiteDatabase sqLiteDatabase, String title, String category) {
-        boolean check = true;
         mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_TITLE + " = ? and " + COL_POST_CATEGORY + " = ?", new String[]{title, category}, null, null, null, null);
-        if (mCursor != null) {
-            if (mCursor.getCount() > 0) {
-                mCursor.close();
-                check = true;
-            } else {
-                mCursor.close();
-                check = false;
-            }
-        }
-        return check;
+        if (mCursor == null || mCursor.getCount() <= 0) return false;
+        mCursor.close();
+        return true;
     }
 
     private void insertDataPost(SQLiteDatabase sqLiteDatabase, List<ListData> data) {
@@ -348,7 +320,7 @@ public final class Database implements ConstDB {
                 values = setContentValuesPost(post);
                 long idPost = sqLiteDatabase.insert(TBL_POST, null, values);
                 if (idPost == -1) {
-                    displayToast("Error insert data Post !");
+                    Toast.makeText(mContext, "Error insert data Post !", Toast.LENGTH_SHORT).show();
                     values.clear();
                     check = 1;
                 } else {
@@ -358,7 +330,7 @@ public final class Database implements ConstDB {
             }
         }
         if (check == 0)
-            displayToast("Insert data Post  success !");
+            Toast.makeText(mContext, "Insert data Post  success !", Toast.LENGTH_SHORT).show();
     }
 
     private void insertDataPostCategory(SQLiteDatabase sqLiteDatabase, String category, ArrayList<String> arrCategory, long id_post) {
@@ -374,7 +346,7 @@ public final class Database implements ConstDB {
                 values.put(COL_CATEGORYPOST_CATEGORY_PRIMARY, 0);
             long id = sqLiteDatabase.insert(TBL_CATEGORYPOST, null, values);
             if (id == -1) {
-                displayToast("Error insert data Category !");
+                Toast.makeText(mContext, "Error insert data Category !", Toast.LENGTH_SHORT).show();
                 values.clear();
             } else
                 values.clear();
@@ -406,17 +378,8 @@ public final class Database implements ConstDB {
      * @param sqLiteDatabase
      */
     private void deletePostTimeLarger10Day(SQLiteDatabase sqLiteDatabase) {
-//        cursor = sqLiteDatabase.delete(tblPost," ")
-    }
-
-    private int returnLimitQueryTblPost() {
-        int limit;
-        try {
-            String s_limit = String.valueOf(R.string.limit_query_tblPost);
-            limit = Integer.parseInt(s_limit);
-        } catch (Exception e) {
-            limit = 20;
-        }
-        return limit;
+        /**
+         *  TODO something
+         */
     }
 }

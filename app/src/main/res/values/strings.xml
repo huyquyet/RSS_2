@@ -42,8 +42,9 @@
     <string name="fragment_detail_post_pubDate_title">Time : </string>
     <string name="fragment_detail_post_category_title">Category : </string>
     <string name="fragment_detail_post_link_title">Link bai viet : </string>
-    <!-- Record limit query tblPost -->
-    <string name="limit_query_tblPost">20</string>
-    <!-- String Menu -->
-    <string name="menu_click_link">Open link</string>
+    <!-- String Dialog FragmentDetail-->
+    <string name="dialog_click_link">Open link</string>
+    <string name="dialog_click_message">Open link in Browser</string>
+    <string name="dialog_click_cancel">Cancel</string>
+    <string name="dialog_click_open">Open</string>
 </resources>
