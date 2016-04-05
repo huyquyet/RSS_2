@@ -50,4 +50,7 @@
     <string name="dialog_click_message">Open link in Browser</string>
     <string name="dialog_click_cancel">Cancel</string>
     <string name="dialog_click_open">Open</string>
+    <!-- Facebook App -->
+    <string name="facebook_app_id">234452083565721</string>
+    <string name="button_facebook_share">share</string>
 </resources>

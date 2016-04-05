@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
 
 import framgia.vn.readrss.R;
 import framgia.vn.readrss.models.Data;
@@ -25,6 +27,7 @@ public class FragmentDetailPost extends Fragment {
     private TextView mTextViewName, mTextViewTitle, mTextViewDescription, mTextViewLink, mTextViewGuid,
             mTextViewPubDate, mTextViewAuthor, mTextViewCategory;
     private ImageView mImageViewEnclosure;
+    private ShareButton btn_share;
 
     public FragmentDetailPost(Data item) {
         this.mItem = item;
@@ -51,6 +54,13 @@ public class FragmentDetailPost extends Fragment {
                 textViewLinkClick();
             }
         });
+        ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                .setContentTitle(mItem.getTitle())
+                .setContentDescription(mItem.getAuthor())
+                .setContentUrl(Uri.parse(mItem.getLink()))
+                .setImageUrl(Uri.parse(mItem.getEnclosure()))
+                .build();
+        btn_share.setShareContent(linkContent);
         return mView;
     }
 
@@ -64,6 +74,7 @@ public class FragmentDetailPost extends Fragment {
         mTextViewAuthor = (TextView) view.findViewById(R.id.textView_fragment_detail_post_author);
         mTextViewCategory = (TextView) view.findViewById(R.id.textView_fragment_detail_post_category);
         mImageViewEnclosure = (ImageView) view.findViewById(R.id.imageView_fragment_detail_post_enclosure);
+        btn_share = (ShareButton) view.findViewById(R.id.share_btn);
     }
 
     private void textViewLinkClick() {
