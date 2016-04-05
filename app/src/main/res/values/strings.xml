@@ -36,6 +36,7 @@
     <string name="fragment_main_atom">Atom : </string>
     <!-- Fragment List Post Text -->
     <string name="fragment_list_post_text">List Fragment</string>
+    <string name="fragment_list_post_toast_het_du_lieu">Het Du Lieu</string>
     <!-- Fragment Detail Post Text -->
     <string name="fragment_detail_post_text">Detail Fragment</string>
     <string name="fragment_detail_post_author_title">Author : </string>
@@ -44,4 +45,9 @@
     <string name="fragment_detail_post_link_title">Link bai viet : </string>
     <!-- Record limit query tblPost -->
     <string name="limit_query_tblPost">20</string>
+    <!-- String Dialog FragmentDetail-->
+    <string name="dialog_click_link">Open link</string>
+    <string name="dialog_click_message">Open link in Browser</string>
+    <string name="dialog_click_cancel">Cancel</string>
+    <string name="dialog_click_open">Open</string>
 </resources>

@@ -149,7 +149,7 @@ public final class Database implements ConstDB {
         result.setCategory(category);
         Data post;
         String limit = start + "," + number;
-        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, COL_POST_ID, "20");
+        mCursor = sqLiteDatabase.query(TBL_POST, null, COL_POST_CATEGORY + " = ?", new String[]{category}, null, null, COL_POST_ID, limit);
         mCursor.moveToFirst();
         while (!mCursor.isAfterLast()) {
             post = new Data();
@@ -189,7 +189,6 @@ public final class Database implements ConstDB {
         if (mCursor == null || mCursor.getCount() <= 0) return false;
         mCursor.close();
         return true;
-
     }
 
     private void insertDataCategoryPost(SQLiteDatabase database) {
@@ -273,7 +272,7 @@ public final class Database implements ConstDB {
     private void insertDataInformation(SQLiteDatabase sqLiteDatabase, Information data) {
         ContentValues values = setContentValuesInformation(data);
         long check = sqLiteDatabase.insert(TBL_INFORMATION, null, values);
-        if (check == -1) {
+        if (check == INSERT_ERROR) {
             Toast.makeText(mContext, "Error insert data Information !", Toast.LENGTH_SHORT).show();
             values.clear();
         } else {

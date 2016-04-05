@@ -14,4 +14,6 @@
     <dimen name="fragment_detail_post_author_textSize">11sp</dimen>
     <dimen name="fragment_detail_post_pubDate_textSize">11sp</dimen>
     <dimen name="fragment_detail_post_category_textSize">11sp</dimen>
+    <dimen name="fragment_detail_post_link_textSize">11sp</dimen>
+    <dimen name="fragment_detail_post_link_title_textSize">14sp</dimen>
 </resources>

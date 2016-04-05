@@ -33,10 +33,12 @@ public class AdapterListPost extends ArrayAdapter<Data> {
         TextView textViewTitle = (TextView) convertView.findViewById(R.id.textView_title);
         TextView textViewDate = (TextView) convertView.findViewById(R.id.textView_date);
         TextView textViewCategory = (TextView) convertView.findViewById(R.id.textView_category);
-        String category = "";
+        TextView textViewStt = (TextView) convertView.findViewById(R.id.textView_stt);
+        StringBuilder category = new StringBuilder();
         for (String data : item.getArrayListCategory()) {
-            category += (data + " - ");
+            category.append(data).append(" - ");
         }
+        textViewStt.setText(String.valueOf(position + 1));
         textViewTitle.setText(item.getTitle());
         textViewDate.setText(item.getPubDate());
         textViewCategory.setText(category);
