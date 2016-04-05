@@ -33,8 +33,6 @@ import framgia.vn.readrss.models.ListData;
 import framgia.vn.readrss.stringInterface.ConstDB;
 import framgia.vn.readrss.stringInterface.Url;
 
-;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ConstDB, Url {
     final static private int REPLACE = 1;

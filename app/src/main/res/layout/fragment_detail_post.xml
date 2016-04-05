@@ -11,7 +11,7 @@
         android:background="@android:color/white"
         android:gravity="left"
         android:paddingBottom="@dimen/text_horizontal_padding"
-        android:paddingStart="@dimen/text_horizontal_padding"
+        android:paddingLeft="@dimen/text_horizontal_padding"
         android:paddingTop="@dimen/text_horizontal_padding"
         android:text="@string/fragment_detail_post_text"
         android:textColor="@android:color/black" />
@@ -92,6 +92,12 @@
                     android:textSize="@dimen/fragment_detail_post_category_textSize" />
             </LinearLayout>
 
+            <ImageView
+                android:id="@+id/imageView_fragment_detail_post_enclosure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
             <TextView
                 android:id="@+id/textView_fragment_detail_post_description"
                 android:layout_width="match_parent"
@@ -101,35 +107,30 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textView_fragment_detail_post_link_title"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/fragment_detail_post_link_title" />
+                    android:text="@string/fragment_detail_post_link_title"
+                    android:textSize="@dimen/fragment_detail_post_link_title_textSize" />
 
                 <TextView
                     android:id="@+id/textView_fragment_detail_post_link"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left"
-                    android:textColor="@android:color/holo_blue_dark" />
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textSize="@dimen/fragment_detail_post_link_textSize" />
             </LinearLayout>
-
 
             <TextView
                 android:id="@+id/textView_fragment_detail_post_guid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center" />
-
-            <ImageView
-                android:id="@+id/imageView_fragment_detail_post_enclosure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
