@@ -1,9 +1,9 @@
 package framgia.vn.readrss.activity.fragment;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -59,6 +59,7 @@ public class FragmentListPost extends Fragment {
                 FragmentManager mFragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment, mFragment);
+                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
         });
@@ -93,7 +94,7 @@ public class FragmentListPost extends Fragment {
                     new loadMoreData().execute(mDataArrayList.size());
                     loading = true;
                 } else {
-                    Toast.makeText(mContext, R.string.fragment_list_post_toast_het_du_lieu, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, R.string.toast_fragment_list_post_het_du_lieu, Toast.LENGTH_SHORT).show();
                     loading = false;
                 }
             }

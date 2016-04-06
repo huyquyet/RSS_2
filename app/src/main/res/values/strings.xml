@@ -36,7 +36,6 @@
     <string name="fragment_main_atom">Atom : </string>
     <!-- Fragment List Post Text -->
     <string name="fragment_list_post_text">List Fragment</string>
-    <string name="fragment_list_post_toast_het_du_lieu">Het Du Lieu</string>
     <!-- Fragment Detail Post Text -->
     <string name="fragment_detail_post_text">Detail Fragment</string>
     <string name="fragment_detail_post_author_title">Author : </string>
@@ -53,4 +52,14 @@
     <!-- Facebook App -->
     <string name="facebook_app_id">234452083565721</string>
     <string name="button_facebook_share">share</string>
+    <!-- String Dialog -->
+    <string name="dialog_main_title">Exit Application</string>
+    <string name="dialog_main_message">Do you want exit application ?</string>
+    <string name="dialog_main_yes">Yes</string>
+    <string name="dialog_main_no">No</string>
+    <!-- String ProgressDialog -->
+    <string name="progress_read_rss_async_message">Please wait load data</string>
+    <!-- String Toast display -->
+    <string name="toast_main_error_connect_internet">Error connect internet</string>
+    <string name="toast_fragment_list_post_het_du_lieu">Het Du Lieu</string>
 </resources>

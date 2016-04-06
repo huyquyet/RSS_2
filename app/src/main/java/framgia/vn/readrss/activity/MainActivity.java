@@ -1,13 +1,13 @@
 package framgia.vn.readrss.activity;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,7 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
@@ -46,12 +46,14 @@ public class MainActivity extends AppCompatActivity
     private ReadRssAsyncTask mReadRssAsyncTask;
     private Database mDatabase = null;
     private SQLiteDatabase mSqLiteDatabase;
+    Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setToolbar();
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         FacebookSdk.sdkInitialize(getApplicationContext());
         getData();
     }
@@ -59,10 +61,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert mDrawer != null;
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment);
+        if (fragmentManager.getBackStackEntryCount() > 1) fragmentManager.popBackStack();
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.dialog_main_title);
+            builder.setMessage(R.string.dialog_main_message);
+            builder.setNegativeButton(R.string.dialog_main_yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.setPositiveButton(R.string.dialog_main_no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.create().show();
         }
     }
 
@@ -93,28 +117,28 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         selectFrag(id);
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert mDrawer != null;
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     private void setToolbar() {
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        FloatingActionButton mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle mToggle = new ActionBarDrawerToggle(
                 this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert mDrawer != null;
         mDrawer.setDrawerListener(mToggle);
         mToggle.syncState();
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert mNavigationView != null;
         mNavigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void setUI() {
+        getInformationFromDataBase();
+        getPostsFromDataBase();
+        setToolbar();
+        setFragmentMain();
     }
 
     private void getData() {
@@ -125,11 +149,9 @@ public class MainActivity extends AppCompatActivity
             mDatabase.insertDataBase(mSqLiteDatabase);
             if (Connection.checkInternetConnection(MainActivity.this)) {
                 getDataFromLinkRss();
-
             } else {
-                getInformationFromDataBase();
-                getPostsFromDataBase();
-                setFragmentMain();
+                Toast.makeText(this, R.string.toast_main_error_connect_internet, Toast.LENGTH_LONG).show();
+                setUI();
             }
         }
     }
@@ -149,9 +171,7 @@ public class MainActivity extends AppCompatActivity
                 listPosts = mReadRssAsyncTask.getListPosts();
                 updateInformation(information);
                 updatePost(listPosts);
-                getInformationFromDataBase();
-                getPostsFromDataBase();
-                setFragmentMain();
+                setUI();
                 return false;
             }
         });
@@ -166,13 +186,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFragment(Fragment fr, int check) {
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         if (check == REPLACE) {
             fragmentTransaction.replace(R.id.fragment, fr);
         } else if (check == ADD) {
             fragmentTransaction.add(R.id.fragment, fr);
         }
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 

@@ -1,6 +1,7 @@
 package framgia.vn.readrss.controller;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.NetworkOnMainThreadException;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ public class ReadRssAsyncTask extends AsyncTask<List<LinkUrl>, Void, Void> imple
     private UpdateData mUpdate;
     private Information mInformation = new Information();
     private FormatDate mFormatDate = new FormatDate();
+    private ProgressDialog mDialog;
 
     public ReadRssAsyncTask(Activity ctx) {
         mContext = ctx;
@@ -57,6 +59,12 @@ public class ReadRssAsyncTask extends AsyncTask<List<LinkUrl>, Void, Void> imple
 
     @Override
     protected void onPreExecute() {
+        // Showing progress dialog before sending http request
+        mDialog = new ProgressDialog(mContext);
+        mDialog.setMessage("Please wait load data");
+        mDialog.setIndeterminate(true);
+        mDialog.setCancelable(false);
+        mDialog.show();
         super.onPreExecute();
     }
 
@@ -76,7 +84,6 @@ public class ReadRssAsyncTask extends AsyncTask<List<LinkUrl>, Void, Void> imple
             e.printStackTrace();
         } catch (NetworkOnMainThreadException e) {
             e.printStackTrace();
-            Toast.makeText(mContext, " Errors ", Toast.LENGTH_LONG).show();
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -95,6 +102,7 @@ public class ReadRssAsyncTask extends AsyncTask<List<LinkUrl>, Void, Void> imple
     @Override
     protected void onPostExecute(Void data) {
         if (mInformation != null) {
+            mDialog.dismiss();
             mUpdate.updateData(true);
         } else {
             mUpdate.updateData(false);
