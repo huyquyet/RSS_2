@@ -1,12 +1,12 @@
 package framgia.vn.readrss.activity.fragment;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +25,9 @@ import framgia.vn.readrss.controller.Connection;
 import framgia.vn.readrss.controller.Database;
 import framgia.vn.readrss.models.Data;
 import framgia.vn.readrss.models.ListData;
+import framgia.vn.readrss.stringInterface.ConstQuery;
 
-public class FragmentListPost extends Fragment {
+public class FragmentListPost extends Fragment implements ConstQuery {
     private List<Data> mDataArrayList = new ArrayList<>();
     private Data mItemSelect = null;
     private ListView mListViewPost;
@@ -36,6 +37,9 @@ public class FragmentListPost extends Fragment {
     private String mNameList;
     private Database mDatabase = new Database(mContext);
     private boolean mCheckEndScroll = false;
+
+    public FragmentListPost() {
+    }
 
     public FragmentListPost(Activity context, List<Data> dataArrayList, String nameList) {
         this.mDataArrayList = dataArrayList;
@@ -90,7 +94,7 @@ public class FragmentListPost extends Fragment {
                 previousTotalItemCount = totalItemCount;
             }
             if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
-                if (mDataArrayList.size() % 10 == 0 && !mCheckEndScroll) {
+                if (mDataArrayList.size() % LIMIT_QUERY_LIST_POST == 0 && !mCheckEndScroll) {
                     new loadMoreData().execute(mDataArrayList.size());
                     loading = true;
                 } else {
@@ -120,9 +124,7 @@ public class FragmentListPost extends Fragment {
                 e.printStackTrace();
             }
             SQLiteDatabase sqLiteDatabase = Connection.connectDataBase(mContext);
-            int start = params[0];
-            int number = 10;
-            result = mDatabase.returnPostsOfCategory(sqLiteDatabase, mNameList, start, number);
+            result = mDatabase.returnPostsOfCategory(sqLiteDatabase, mNameList, params[0], LIMIT_QUERY_LIST_POST);
             sqLiteDatabase.close();
             return result;
         }

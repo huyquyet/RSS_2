@@ -46,6 +46,7 @@ public interface ConstDB {
     public static final String COL_POST_ENCLOSURE = "enclosure";
 
     //  Table TBL_TIMEUPDATE
+    public static final String COL_TIMEUPDATE_ID = "id";
     public static final String COL_TIMEUPDATE_TIME = "time";
 
     //  Table TBL_CATEGORYPOST
@@ -82,7 +83,8 @@ public interface ConstDB {
             COL_POST_AUTHOR + " text, " +
             COL_POST_ENCLOSURE + " text)";
     public static final String SQL_TIMEUPDATE = " create table " + TBL_TIMEUPDATE + " (" +
-            COL_TIMEUPDATE_TIME + " datetime)";
+            COL_TIMEUPDATE_ID + " integer primary key autoincrement, " +
+            COL_TIMEUPDATE_TIME + " text)";
     public static final String SQL_CATEGORY_POST = "create table " + TBL_CATEGORYPOST + "(" +
             COL_CATEGORYPOST_ID_POST + " integer not null constraint " + COL_CATEGORYPOST_ID_POST +
             " references " + TBL_POST + "(" + COL_POST_ID + ") on delete cascade," +

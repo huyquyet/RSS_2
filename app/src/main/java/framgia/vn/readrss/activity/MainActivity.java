@@ -60,33 +60,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        assert mDrawer != null;
-        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
-            mDrawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment);
         if (fragmentManager.getBackStackEntryCount() > 1) fragmentManager.popBackStack();
         else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.dialog_main_title);
-            builder.setMessage(R.string.dialog_main_message);
-            builder.setNegativeButton(R.string.dialog_main_yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            builder.setPositiveButton(R.string.dialog_main_no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.create().show();
+            exitApplication();
         }
     }
 
@@ -104,9 +82,9 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int mId = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (mId == R.id.action_settings) {
-            return true;
-        }
+//        if (mId == R.id.action_settings) {
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -146,14 +124,26 @@ public class MainActivity extends AppCompatActivity
         //  Open connect mDatabase
         mSqLiteDatabase = Connection.connectDataBase(MainActivity.this);
         if (mSqLiteDatabase != null) {
-            mDatabase.insertDataBase(mSqLiteDatabase);
-            if (Connection.checkInternetConnection(MainActivity.this)) {
-                getDataFromLinkRss();
+            boolean checkInsert = mDatabase.insertDataBase(mSqLiteDatabase);
+            if (checkInsert) {
+                if (Connection.checkInternetConnection(MainActivity.this)) getDataFromLinkRss();
             } else {
-                Toast.makeText(this, R.string.toast_main_error_connect_internet, Toast.LENGTH_LONG).show();
-                setUI();
+                if (checkUpdate()) {
+                    if (Connection.checkInternetConnection(MainActivity.this)) {
+                        getDataFromLinkRss();
+                        mDatabase.updateTimeUpdate();
+                    } else {
+                        setUI();
+                        Toast.makeText(this, R.string.toast_main_error_connect_internet, Toast.LENGTH_LONG).show();
+                    }
+                } else setUI();
             }
-        }
+        } else
+            Toast.makeText(this, R.string.toast_main_error_connect_database, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean checkUpdate() {
+        return mDatabase.checkTimeUpdate();
     }
 
     private void getDataFromLinkRss() {
@@ -197,6 +187,14 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+    private void clearBackStack() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 1) {
+            FragmentManager.BackStackEntry first = fragmentManager.getBackStackEntryAt(1);
+            fragmentManager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
     private void setFragmentMain() {
         // get fragment manager
         setFragment(new FragmentMain(mInformation), ADD);
@@ -204,6 +202,7 @@ public class MainActivity extends AppCompatActivity
 
     private void selectFrag(int idItem) {
         Fragment fr;
+        clearBackStack();
         switch (idItem) {
             case R.id.nav_usa:
                 getArrListCategory(NAME_URL_USA);
@@ -261,19 +260,8 @@ public class MainActivity extends AppCompatActivity
                 getArrListCategory(NAME_URL_DAY_IN_PHOTOS);
                 fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_DAY_IN_PHOTOS);
                 break;
-            case R.id.nav_extra_time:
-                getArrListCategory(NAME_URL_SHAKA_EXTRA_TIME);
-                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_SHAKA_EXTRA_TIME);
-                break;
-            case R.id.nav_visiting:
-                getArrListCategory(NAME_URL_VISITING_THE_USA);
-                fr = new FragmentListPost(MainActivity.this, mCategoryArrList, NAME_URL_VISITING_THE_USA);
-                break;
             case R.id.nav_exit:
-                fr = new FragmentMain(mInformation);
-                break;
-            case R.id.nav_deleteDatabase:
-                mDatabase.delete_Database(mSqLiteDatabase);
+                exitApplication();
                 fr = new FragmentMain(mInformation);
                 break;
             default:
@@ -298,5 +286,24 @@ public class MainActivity extends AppCompatActivity
 
     private void updatePost(List<ListData> data) {
         mDatabase.insertOrUpdateDataPost(data);
+    }
+
+    private void exitApplication() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.dialog_main_title);
+        builder.setMessage(R.string.dialog_main_message);
+        builder.setNegativeButton(R.string.dialog_main_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.setPositiveButton(R.string.dialog_main_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.create().show();
     }
 }

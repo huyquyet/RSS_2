@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,8 +18,9 @@ import framgia.vn.readrss.models.Data;
 import framgia.vn.readrss.models.Information;
 import framgia.vn.readrss.models.ListData;
 import framgia.vn.readrss.stringInterface.ConstDB;
+import framgia.vn.readrss.stringInterface.ConstQuery;
 
-public final class Database implements ConstDB {
+public final class Database implements ConstDB, ConstQuery{
     private static final int INSERT_ERROR = -1;
     private static final int ID_INFORMATION_ERROR = -1;
     private Activity mContext;
@@ -29,7 +33,7 @@ public final class Database implements ConstDB {
         this.mContext = context;
     }
 
-    public void insertDataBase(SQLiteDatabase database) {
+    public boolean insertDataBase(SQLiteDatabase database) {
         try {
             if (database != null) {
                 if (!isDatabaseExists(database, TBL_POST)) {
@@ -60,11 +64,14 @@ public final class Database implements ConstDB {
                      */
                     database.execSQL(SQL_CATEGORY_POST);
                     insertDataCategoryPost(database);
-                }   // End if (!isDatabaseExists(database, TBL_POST))
-            }   // End if(database != null)
-            database.close();
+                    insertTimeUpdate(database);
+                    database.close();
+                    return true;
+                } else return false;  // End if (!isDatabaseExists(database, TBL_POST))
+            } else return false;  // End if(database != null)
         } catch (Exception ex) {
             delete_Database(database);
+            return false;
         }
     }
 
@@ -73,6 +80,44 @@ public final class Database implements ConstDB {
             Toast.makeText(mContext, "Delete data success", Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(mContext, "Delete data error", Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean checkTimeUpdate() {
+        String dateNow = returnDateNowStringFormatDDMMYYY();
+        if (!checkConnectDataBase()) return false;
+        mCursor = mSQLiteDatabase.query(TBL_TIMEUPDATE, null, null, null, null, null, null);
+        if (mCursor == null || mCursor.getCount() <= 0) {
+            closeConnectDataBase();
+            return false;
+        }
+        mCursor.moveToFirst();
+        String date = mCursor.getString(0);
+        try {
+            Date date1 = FormatDate.formatStringToDate_DDMMYYY(date);
+            Date date2 = FormatDate.formatStringToDate_DDMMYYY(dateNow);
+            if (date1.compareTo(date2) < 0) {
+                closeConnectDataBase();
+                return true;
+            }
+        } catch (ParseException e) {
+            closeConnectDataBase();
+            return false;
+        }
+        closeConnectDataBase();
+        return false;
+    }
+
+    public void updateTimeUpdate() {
+        mValues = new ContentValues();
+        mValues.put(COL_TIMEUPDATE_TIME, returnDateNowStringFormatDDMMYYY());
+        if (!checkConnectDataBase()) return;
+        int check = mSQLiteDatabase.update(TBL_TIMEUPDATE, mValues, COL_TIMEUPDATE_ID + "=?", new String[]{String.valueOf(1)});
+        if (check > 0) mValues.clear();
+        else {
+            Toast.makeText(mContext, "Error update time !", Toast.LENGTH_SHORT).show();
+            mValues.clear();
+        }
+        closeConnectDataBase();
     }
 
     public void insertOrUpdateDataPost(List<ListData> data) {
@@ -127,7 +172,7 @@ public final class Database implements ConstDB {
     public List<ListData> returnDataPost() {
         List<ListData> result = new ArrayList<>();
         if (!checkConnectDataBase()) return result;
-        int limit = 20; // So ban ghi lay ve trong 1 lan truy van
+        int limit = LIMIT_QUERY_LIST_POST; // So ban ghi lay ve trong 1 lan truy van
         for (Category cate : mCategory.getCategoryArrayList()) {
             result.add(returnPostsOfCategory(mSQLiteDatabase, cate.getName(), 0, limit));
         }
@@ -206,6 +251,17 @@ public final class Database implements ConstDB {
         Toast.makeText(mContext, "Insert database CategoryPost success !", Toast.LENGTH_SHORT).show();
     }
 
+    private void insertTimeUpdate(SQLiteDatabase database) {
+        mValues = new ContentValues();
+        mValues.put(COL_TIMEUPDATE_TIME, returnDateNowStringFormatDDMMYYY());
+        long check = database.insert(TBL_TIMEUPDATE, null, mValues);
+        if (check == INSERT_ERROR) {
+            Toast.makeText(mContext, "Error insert TimeUpdate", Toast.LENGTH_SHORT).show();
+            mValues.clear();
+        } else mValues.clear();
+    }
+
+
     private int checkDataInformation(SQLiteDatabase sqLiteDatabase) {
         int idInformation = ID_INFORMATION_ERROR;
         mCursor = sqLiteDatabase.query(TBL_INFORMATION, null, null, null, null, null, null);
@@ -262,6 +318,7 @@ public final class Database implements ConstDB {
         ContentValues values = setContentValuesInformation(data);
         int check = sqLiteDatabase.update(TBL_INFORMATION, values, COL_INFORMATION_ID + "=?", new String[]{String.valueOf(idInformation)});
         if (check > 0) {
+            Toast.makeText(mContext, "insert data Information !", Toast.LENGTH_SHORT).show();
             values.clear();
         } else {
             Toast.makeText(mContext, "Error update data Information !", Toast.LENGTH_SHORT).show();
@@ -377,5 +434,13 @@ public final class Database implements ConstDB {
             mCursor.close();
         }
         return idCategory;
+    }
+
+    /**
+     * @return
+     */
+    private String returnDateNowStringFormatDDMMYYY() {
+        Calendar now = Calendar.getInstance();
+        return FormatDate.formatDateToString_DDMMYYY(now.getTime());
     }
 }

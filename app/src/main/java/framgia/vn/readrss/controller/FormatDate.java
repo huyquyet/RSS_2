@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import framgia.vn.readrss.stringInterface.StringFormatDate;
 
-public class FormatDate implements StringFormatDate {
+public final class FormatDate implements StringFormatDate {
     /**
      * Format StringFormatDate to String Format dd/MM/yyyy HH:mm:ss
      *
@@ -29,7 +29,16 @@ public class FormatDate implements StringFormatDate {
     public Date formatDate(String data) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(FORMAT_XML, Locale.ENGLISH);
         Date date = dateFormat.parse(data);
-        System.out.println(date);
         return date;
+    }
+
+    public static String formatDateToString_DDMMYYY(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(FORMAT_DATE_DD_MM_YYYY);
+        return simpleDateFormat.format(date);
+    }
+
+    public static Date formatStringToDate_DDMMYYY(String date) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(FORMAT_DATE_DD_MM_YYYY);
+        return simpleDateFormat.parse(date);
     }
 }

@@ -6,4 +6,5 @@ package framgia.vn.readrss.stringInterface;
 public interface StringFormatDate {
     final static public String FORMAT_XML = "EEE, d MMM yyyy HH:mm:ss Z";
     final static public String FORMAT_DATE = "dd/MM/yyyy HH:mm:ss";
+    final static public String FORMAT_DATE_DD_MM_YYYY = "dd/MM/yyyy";
 }

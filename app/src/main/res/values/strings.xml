@@ -60,6 +60,7 @@
     <!-- String ProgressDialog -->
     <string name="progress_read_rss_async_message">Please wait load data</string>
     <!-- String Toast display -->
-    <string name="toast_main_error_connect_internet">Error connect internet</string>
+    <string name="toast_main_error_connect_internet">Connect internet needs update !</string>
+    <string name="toast_main_error_connect_database">Error connect database</string>
     <string name="toast_fragment_list_post_het_du_lieu">Het Du Lieu</string>
 </resources>
